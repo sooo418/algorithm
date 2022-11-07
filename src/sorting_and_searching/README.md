@@ -2,12 +2,11 @@
 
 - 퀵정렬이란 배열에서 중간 위치의 값을 기준으로 잡고 기준값보다 작으면 왼쪽에 크면 오른쪽에 옮기는 방식입니다.
 - 시간 복잡도 : O(n log n)
+- 최악의 경우 : O(n2)
 
 ## partitioning
 
-s                                                                                            e
-
-| 3 | 9 | 4 | 7 | 5 | 0 | 1 | 6 | 8 | 2 |
+| s 3 | 9 | 4 | 7 | 5 | 0 | 1 | 6 | 8 | e 2 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 기준값 pivot = 5
@@ -22,24 +21,18 @@ s                                                                               
 1. s = 3, e = 2 : s가 pivot값보다 작으므로 무시
 2. s = 9, e = 2 : s가 pivot값보다 크면 e를 비교한다. e가 pivot값보다 작으니 s값과 e값으로 서로 스왑하고 s,e 포인터를 한칸씩 앞당겨준다.
 
-                        s                                                              e
-
-| 3 | 2 | 4 | 7 | 5 | 0 | 1 | 6 | 8 | 9 |
+| 3 | 2 | s 4 | 7 | 5 | 0 | 1 | 6 | e 8 | 9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 1. s = 4, e = 8 : s가 pivot값보다 작으므로 무시
 2. s = 7, e = 8 : s가 pivot값보다 크니 e를 비교한다. e가 pivot값보다 크므로 무시
 3. s = 7, e = 6 : 전단계와 같이 e가 pivot값보다 크므로 무시
 4. s = 7, e = 1 : e가 pivot값보다 작으므로 s와 e를 스왑하고 포인터를 앞당겨줌.
 
-                                              s        e
-
-| 3 | 2 | 4 | 1 | 5 | 0 | 7 | 6 | 8 | 9 |
+| 3 | 2 | 4 | 1 | s 5 | e 0 | 7 | 6 | 8 | 9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 1. s = 5, e = 0 : s가 pivot값보다 크지 않으니 e를 비교한다. e가 pivot값보다 작으니 둘이 스왑하고 포인터를 앞당겨줌
 
-                                             e         s
-
-| 3 | 2 | 4 | 1 | 0 | 5 | 7 | 6 | 8 | 9 |
+| 3 | 2 | 4 | 1 | e 0 | s 5 | 7 | 6 | 8 | 9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 1. 이때 e와 s가 정해진 범위를 벗어나므로 반복문이 종료되면서 pivot의 위치값을 반환해준다.
 2. 그럼 반환받은 위치값으로 배열을 나누고 왼쪽 배열과 오른쪽 배열을 위와 같은 방식으로 정렬해준다.
@@ -95,4 +88,115 @@ public class QuickSort {
         printArray(arr);
     }
 }
+```
+
+# Merge Sort
+
+- 배열을 2개의 원소를 가진 배열로 쪼개 배열을 병합해주며 정렬해주는 방식
+- 시간 복잡도 : O(n log n)
+   - 배열의 개수 : n X 배열을 나누는 횟수 : log n
+- merge sort는 실행시 별도의 저장공간이 필요시 함.
+
+| 4 | 2 | 6 | 3 | 7 | 8 | 5 | 1 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+1. 정렬이 되지않은 배열을 절반씩 자르며 2개의 배열이 될때까지 자른다.
+
+| 4 | 2 | 6 | 3 |
+| --- | --- | --- | --- |
+
+| 7 | 8 | 5 | 1 |
+| --- | --- | --- | --- |
+
+| 4 | 2 |
+| --- | --- |
+
+| 6 | 3 |
+| --- | --- |
+
+| 7 | 8 |
+| --- | --- |
+
+| 5 | 1 |
+| --- | --- |
+1. 2개의 배열을 하나씩 정렬해준다.
+
+| 2 | 4 |
+| --- | --- |
+
+| 3 | 6 |
+| --- | --- |
+
+| 7 | 8 |
+| --- | --- |
+
+| 1 | 5 |
+| --- | --- |
+1. 정렬이 된 배열 2개를 비교해 정렬해준다. → 반복
+
+| 2 | 3 | 4 | 6 |
+| --- | --- | --- | --- |
+
+| 1 | 5 | 7 | 8 |
+| --- | --- | --- | --- |
+
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+```java
+package sorting_and_searching;
+
+public class MergeSort {
+  public static void mergeSort(int[] arr) {
+    int[] tmp = new int[arr.length];
+    mergeSort(arr, tmp, 0, arr.length - 1);
+  }
+  private static void mergeSort(int[] arr, int[] tmp, int start, int end) {
+    if ( start < end ) {
+      int mid = (start + end) / 2;
+      mergeSort(arr, tmp, start, mid);
+      mergeSort(arr, tmp, mid + 1, end);
+      merge(arr, tmp, start, mid, end);
+    }
+  }
+  private static void merge(int[] arr, int[] tmp, int start, int mid, int end) {
+    {
+      int i = start;
+      while (i <= end) {
+        tmp[i] = arr[i];
+        i++;
+      }
+    }
+    int part1 = start;
+    int part2 = mid + 1;
+    int index = start;
+    while(part1 <= mid && part2 <= end) {
+      if ( tmp[part1] <= tmp[part2] ) {
+        arr[index] = tmp[part1];
+        part1++;
+      } else {
+        arr[index] = tmp[part2];
+        part2++;
+      }
+      index++;
+    }
+    int i = 0;
+    while (i <= mid - part1) {
+      arr[index + i] = tmp[part1 + i];
+      i++;
+    }
+  }
+  public static void printArray(int[] arr) {
+    for(int data : arr) {
+      System.out.print(data + ", ");
+    }
+    System.out.println();
+  }
+  public static void main(String[] args) {
+    int[] arr = {3,9,4,7,5,0,1,6,8,2};
+    printArray(arr);
+    mergeSort(arr);
+    printArray(arr);
+  }
+}
+
 ```
