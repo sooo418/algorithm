@@ -200,3 +200,72 @@ public class MergeSort {
 }
 
 ```
+
+# Bubble Sort
+
+- 맨 앞의 원소부터 뒤의 원소를 비교하면서 맨 뒤의 원소까지 비교하여 정렬하는 방식
+- 시간 복잡도 : O(n^2)
+
+| 3 | 5 | 4 | 2 | 1 |
+| --- | --- | --- | --- | --- |
+1. 앞의 두 원소를 비교한다. (3, 5) → 변함없음
+2. 이어서 1번과 같이 맨 끝의 원소까지 비교하여 위치를 변경해준다.
+
+(5, 4) → 위치변경  (5, 2) → 위치변경  (5, 1) → 위치변경
+
+| 3 | 4 | 2 | 1 | 5 |
+| --- | --- | --- | --- | --- |
+1. 또 다시 맨 앞에서부터 비교 시작
+
+(3, 4) → 변함없음  (4, 2) → 위치변경  (4, 1) → 위치변경
+
+| 3 | 2 | 1 | 4 | 5 |
+| --- | --- | --- | --- | --- |
+1. 위와 같이 반복
+
+(3, 2) → 위치변경  (3, 1) → 위치변경
+
+| 2 | 1 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- |
+
+(2, 1) → 위치변경
+
+| 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- |
+
+```java
+package sorting_and_searching;
+
+public class BubbleSort {
+    private static void bubbleSort(int[] arr) {
+        bubbleSort(arr, arr.length - 1);
+    }
+    private static void bubbleSort(int[] arr, int last) {
+        if ( last > 0 ) {
+            for(int i = 1; i <= last; i++) {
+                if ( arr[i - 1] > arr[i] ) {
+                    swap(arr, i - 1, i);
+                }
+            }
+            bubbleSort(arr, last - 1);
+        }
+    }
+    private static void swap(int[] arr, int source, int target) {
+        int tmp = arr[source];
+        arr[source] = arr[target];
+        arr[target] = tmp;
+    }
+    private static void printArray(int[] arr) {
+        for(int data : arr) {
+            System.out.print(data + ", ");
+        }
+        System.out.println();
+    }
+    public static void main(String[] args) {
+        int[] arr = {3, 5, 4, 2, 1};
+        printArray(arr);
+        bubbleSort(arr);
+        printArray(arr);
+    }
+}
+```
