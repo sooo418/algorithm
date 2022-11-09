@@ -269,3 +269,69 @@ public class BubbleSort {
     }
 }
 ```
+
+# Selection Sort
+
+- 배열을 돌면서 가장 작은거부터 하나씩 앞으로 옮기는 방식
+- 시간 복잡도 : O(n^2)
+
+| 3 | 5 | 4 | 2 | 1 |
+| --- | --- | --- | --- | --- |
+1. 먼저 배열에서 맨 원소부터 비교하면서 가장 작은값을 구한다. min = 3 → 2 → 1
+2. min 값을 맨 앞의 원소와 변경해준다.
+
+| 1 | 5 | 4 | 2 | 3 |
+| --- | --- | --- | --- | --- |
+1. 변경해준 후의 다음 원소부터 비교하면서 작은값을 구한다. min = 5 → 4 → 2
+2. min 값을 두 번째 원소와 변경해준다.
+
+| 1 | 2 | 4 | 5 | 3 |
+| --- | --- | --- | --- | --- |
+1. 위와 같이 정렬이 될때까지 반복해준다.
+
+min = 4 → 3
+
+| 1 | 2 | 3 | 5 | 4 |
+| --- | --- | --- | --- | --- |
+
+min = 5 → 4
+
+| 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- |
+
+```java
+package sorting_and_searching;
+
+public class SelectionSort {
+    private static void selectionSort(int[] arr) {
+        selectionSort(arr, 0);
+    }
+    private static void selectionSort(int[] arr, int start) {
+        if ( start < arr.length - 1 ) {
+            int min_index = start;
+            for(int i = start; i < arr.length; i++) {
+                if ( arr[i] < arr[min_index] ) min_index = i;
+            }
+            swap(arr, start, min_index);
+            selectionSort(arr, start + 1);
+        }
+    }
+    private static void swap(int[] arr, int index1, int index2) {
+        int tmp = arr[index1];
+        arr[index1] = arr[index2];
+        arr[index2] = tmp;
+    }
+    private static void printArray(int[] arr) {
+        for(int data : arr) {
+            System.out.print(data + ", ");
+        }
+        System.out.println();
+    }
+    public static void main(String[] args) {
+        int[] arr = {3,6,1,8,2,4};
+        printArray(arr);
+        selectionSort(arr);
+        printArray(arr);
+    }
+}
+```
