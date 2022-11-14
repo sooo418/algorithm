@@ -136,3 +136,96 @@ public class HashTableAlgorithm {
     }
 }
 ```
+
+# Array List
+
+- Array List는 PHP에서는 Dynamic 한 성질을 가지지만 Java에서는 Fixed 한 성질을 가진다.
+- 하지만 Java Library에서 제공하는 Array List는 데이터를 추가해주면 사이즈가 늘어난다. (Dynamic)
+  - 그럼에도 불구하고 여전히 데이터를 찾는데 걸리는 시간은 O(1)이다.
+  - 그 이유는 Array List는 배열방이 다 차면 배열방을 2배로 늘려주는 작업을 하기 때문에 검색할때는 고정된 배열에서 검색을 하기 때문이다.
+    - 두 배 크기의 새로운 배열을 선언하고 기존에 있던 배열의 데이터를 복사해주는 작업을 ‘Doubling’이라고 한다.
+    - Doubling을 실행하는 시간은 기존에 있던 데이터의 개수가 n이라고하면 O(n)만큼 걸린다.
+
+    $$
+    n/2 + n/4 + n/8 + ... + 2 + 1
+    $$
+
+    - 이런 번거로운 작업을 하는데도 불구하고 Array List에 데이터를 입력하는 시간은 O(1)이 걸린다.
+    - 그 이유는 데이터를 넣을때 Doubling이 일어나지 않는다면 하나의 데이터를 넣는데 걸리는 시간은 O(1)이기 때문이다.
+    - 물론 하나의 데이터를 넣는데 Doubling이 일어나면 O(n)의 시간이 걸리게 될것이다.
+- 즉 평균적으로 Array List에서 데이터를 찾는 시간과 데이터를 입력하는 시간은 O(1)이 걸리게 된다.
+
+```java
+package arrays_and_strings;
+
+class ArrayList {
+    private Object[] data;
+    private int size;
+    private int index;
+
+    public ArrayList() {
+        this.size = 1;
+        this.data = new Object[this.size];
+        this.index = 0;
+    }
+
+    public void add(Object obj) {
+        System.out.println("index: " + this.index + ", size: " + this.size + ", data size: " + this.data.length);
+        if ( this.index == this.size - 1 ) {
+            doubling();
+        }
+        data[this.index] = obj;
+        this.index++;
+    }
+    private void doubling() {
+        this.size = this.size * 2;
+        Object[] newData = new Object[this.size];
+
+        for(int i = 0; i < data.length; i++) {
+            newData[i] = data[i];
+        }
+        this.data = newData;
+        System.out.println(" ***index: " + this.index + ", size: " + this.size + ", data size: " + this.data.length);
+    }
+    public Object get(int i) throws Exception {
+        if ( i > this.index - 1 ) {
+            throw new Exception("ArrayIndexOutOfBound");
+        } else if ( i < 0 ) {
+            throw new Exception("Negative Value");
+        }
+        return this.data[i];
+    }
+    public void remove(int i) throws Exception {
+        if (i > this.index - 1) {
+            throw new Exception("ArrayIndexOutOfBound");
+        } else if (i < 0) {
+            throw new Exception("Negative Value");
+        }
+        System.out.println("data removed: " + this.data[i]);
+
+        for(int x = i; x < this.data.length - 1; x++) {
+            data[x] = data[x + 1];
+        }
+        this.index--;
+    }
+}
+public class ArrayListAlgorithm {
+
+    public static void main(String[] args) throws Exception {
+        ArrayList al = new ArrayList();
+        al.add("0");
+        al.add("1");
+        al.add("2");
+        al.add("3");
+        al.add("4");
+        al.add("5");
+        al.add("6");
+        al.add("7");
+        al.add("8");
+        al.add("9");
+        System.out.println(al.get(5));
+        al.remove(5);
+        System.out.println(al.get(5));
+    }
+}
+```
