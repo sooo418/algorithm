@@ -229,3 +229,98 @@ public class ArrayListAlgorithm {
     }
 }
 ```
+
+# String Builder
+
+```java
+String joinWords(String[] words) {
+	String sentence = "";
+	for(String w : words) {
+		sentence = sentence + w;
+	}
+}
+```
+
+- 위의 코드에서 ‘sentence = sentence + w;’ 코드는 보기에는 엄청 간단해 보이지만 뒤 단에서는 복잡한 작업을 한다.
+- 뒤에서의 작업
+  - entence 와 w의 문자열을 합한만큼의 문자열을 새로 생성하고 두 문자열을 앞에서부터 단어 하나씩 복사해서 갖다 붙여넣기를 해준다.
+
+$$
+x + 2x + 3x + ... + nx
+$$
+
+- 각 단어의 문자의 길이를 x라고 할때 위의 공식의 시간만큼 수행시간이 걸리게 된다. → 시간 복잡도 : O(xn^2)
+- 위와 같은 문제를 해결하기 위해 Java에서는 String Builder를 제공해준다.
+
+```java
+String joinWords(String[] words) {
+	StringBuilder sb = new StringBuilder();
+	for(String w : words) {
+		sb.append(w);
+	}
+	return sb.toString();
+}
+```
+
+- String Builder는 클래스 안에 배열 공간을 미리 만들어놓고 append함수가 호출되면 추가되는 문자열을 해당 배열 공간에 바로 추가해주기 때문에 문자열을 더할때 마다 문자열을 새로 추가하지 않는다.
+- 배열 공간이 부족하면 그때만 배열을 복사하여 시간을 현저히 절약할 수 있다.
+- 그 밖에 StringBuffer를 제공해주는데 StringBuilder가 비동기라면 StringBuffer는 동기적인 특성을 가진다.
+
+<aside>
+💡 StringBuilder - asynchronized
+StringBuffer  - synchronized
+
+</aside>
+
+```java
+package arrays_and_strings;
+
+class StringBuilder {
+    private char[] value;
+    private int size;
+    private int index;
+
+    StringBuilder() {
+        size = 1;
+        value = new char[size];
+        index = 0;
+    }
+
+    public void append(String str) {
+        if ( str == null ) str = "null";
+        int len = str.length();
+        ensureCapacity(len);
+        for(int i = 0; i < str.length(); i++) {
+            value[index] = str.charAt(i);
+            index++;
+        }
+        System.out.println(size + ", " + index);
+    }
+
+    private void ensureCapacity(int len) {
+        if ( index + len > size ) {
+            size = (size + len) * 2;
+            char[] newValue = new char[size];
+            for(int i = 0; i < value.length; i++) {
+                newValue[i] = value[i];
+            }
+            value = newValue;
+            System.out.println("*** " + size + ", " + index);
+        }
+    }
+
+    public String toString() {
+        return new String(value, 0, index);
+    }
+}
+
+public class StringBuilderAlgorithm {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("sung");
+        sb.append(" is");
+        sb.append(" pretty");
+        System.out.println(sb.toString());
+    }
+}
+```
