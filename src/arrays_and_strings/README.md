@@ -324,3 +324,95 @@ public class StringBuilderAlgorithm {
     }
 }
 ```
+
+# String
+
+- 주어진 문자열의 문자들이 모두 고유한지를 확인하는 함수를 구현하시오. 만약 별도의 저장공간을 사용하지 못하는 경우에는 어떻게 해결할지도 추가로 설명하시오.
+- ex) “abcddef”
+- 문자열이 ASCII 로만 이루어진 문자열인지 Unicode까지 포괄하고있는 문자열인지에 대해 푸는 방식이 달라진다.
+
+## ASCII로만 이루어진 문자열일 경우
+
+1. boolean을 값으로 가지는 128개의 배열방을 만들고 모든값을 false로 초기화를 시켜준다.
+2. 해당 문자열을 한문자씩 돌면서 해당 문자의 ASCII값으로 배열방을 접근해서 true인지 체크한다.
+3. true가 아니라면 값을 true로 바꿔주고, 이미 true라면 기존에 앞에서 한번 나왔던 값이므로 해당 문자를 중복으로 인식한다.
+
+```java
+package arrays_and_strings;
+
+public class StringAlgorithm {
+    public static void main(String[] args) {
+        System.out.println(isUnique("abcdefgghijk"));
+        System.out.println(isUnique("abcdefghijk"));
+    }
+    private static boolean isUnique(String str) {
+        if ( str.length() > 128 ) return false;
+        boolean[] char_set = new boolean[128];
+        for(int i = 0; i < str.length(); i++) {
+            int val = str.charAt(i);
+            if ( char_set[val] ) {
+                return false;
+            }
+            char_set[val] = true;
+        }
+        return true;
+    }
+}
+```
+
+## Unicode까지 포괄한 문자열일 경우
+
+- Unicode의 문자 길이는 2^20 + 2^16개로 1,114,112개의 문자가 존재합니다.
+- 이 경우는 Java의 HashMap을 사용해서 해결할 수 있다.
+
+```java
+package arrays_and_strings;
+
+import java.util.HashMap;
+
+public class StringAlgorithm {
+    public static void main(String[] args) {
+        System.out.println(isUnique("abcdefgghijk"));
+        System.out.println(isUnique("abcdefghijk"));
+    }
+    private static boolean isUnique(String str) {
+        HashMap<Integer, Boolean> hashmap = new HashMap<Integer, Boolean>();
+        for(int i = 0; i < str.length(); i++) {
+            int c = str.charAt(i);
+            if ( hashmap.containsKey(c) ) {
+                return false;
+            }
+            hashmap.put(c, true);
+        }
+        return true;
+    }
+}
+```
+
+## 문자열의 문자들이 소문자로만 이루어졌을 경우
+
+- a - z : 26 개의 문자이기에 Bit 연산자로만으로 문제를 풀 수 있다.
+
+```java
+package arrays_and_strings;
+
+import java.util.HashMap;
+
+public class StringAlgorithm {
+    public static void main(String[] args) {
+        System.out.println(isUnique("abcdefgghijk"));
+        System.out.println(isUnique("abcdefghijk"));
+    }
+    private static boolean isUnique(String str) {
+        int checker = 0;
+        for(int i = 0; i < str.length(); i++) {
+            int val = str.charAt(i) - 'a';
+            if ( ( checker & ( 1 << val ) ) > 0 ) {
+                return false;
+            }
+            checker |= ( 1 << val );
+        }
+        return true;
+    }
+}
+```
