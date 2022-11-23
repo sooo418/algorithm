@@ -479,3 +479,65 @@ public class StringAlgorithm2 {
     }
 }
 ```
+
+# 문자열안의 공백을 URL인코딩하기
+
+- 주어진 문자열의 공백을 %20으로 변환하는 함수를 구현하시오.
+  - 문자열의 맨끝에는 변환에 필요한 충분한 공백이 있고, 실제 문자열의 사이즈를 알고있음.
+- Example
+  - Input    : “Mr John Smith“
+  - Output : “Mr&20John%20Smith”
+1. 본 문자열을 캐릭터 별로 배열에 담는다.
+
+| M | r |  | J | o | h | n |  | S | m | i | t | h |  |  |  |  |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+1. 해당 문자열의 길이는 13인데 빈칸을 %20으로 치환해야하기 때문에 빈칸 하나당 2의 길이를 더해주어야한다.
+  1. 치환 후 문자열의 길이 13 + 2 X 2
+2. 위의 배열은 충분한 사이즈를 가지고 있기 때문에 뒤에서부터 문자열을 이동시켜준다.
+3. i를 16의 인덱스부터 시작하여 값을 줄이면서 12의 인덱스에 위치한 h부터 문자열을 옮겨준다.
+
+| M | r |  | J | o | h | n |  | S | m | i | t | (p) |  |  |  | h(i) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+1. i와 p를 줄여나가며 문자열을 옮기다보면 빈칸을 만나게된다. 그때 빈칸을 %20으로 치환해주어야 하기때문에 p는 값을 유지하면서 i의 값을 감소시켜주면서 %20을 배열에 채워준다.
+
+| M | r |  | J | o | h | n | (p) |  |  |  | (i) | S | m | i | t | h |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+>>>
+
+| M | r |  | J | o | h | n | (p) |  | %(i) | 2 | 0 | S | m | i | t | h |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+1. 위와 같이 반복해주면 결과값이 나온다.
+
+| M | r | % | 2 | 0 | J | o | h | n | % | 2 | 0 | S | m | i | t | h |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+```java
+package arrays_and_strings;
+
+public class UrlEncoding {
+    public static void main(String[] args) {
+        System.out.println(URLify("Mr John Smith      ", 13));
+    }
+    private static String URLify(String str, int len) {
+        return URLify(str.toCharArray(), len);
+    }
+    private static String URLify(char[] str, int len) {
+        int spaces = 0;
+        for(int i = 0; i < len; i++) {
+            if ( str[i] == ' ' ) spaces++;
+        }
+        int index = len + spaces * 2 - 1;
+        for(int p = len - 1; p >= 0; p--) {
+            if ( str[p] == ' ' ) {
+                str[index--] = '0';
+                str[index--] = '2';
+                str[index--] = '%';
+            } else {
+                str[index--] = str[p];
+            }
+        }
+        return new String(str);
+    }
+}
+```
