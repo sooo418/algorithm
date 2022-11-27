@@ -541,3 +541,200 @@ public class UrlEncoding {
     }
 }
 ```
+
+# 문자열이 회문의 치환인지 확인하기
+
+- 주어진 문자열이 회문(palindrome)을 만들 수 있는 문자열의 치환(permutation)인지를 확인하는 함수를 만드시오.
+- 회문(palindrome)
+  - 앞으로 읽으나 뒤로 읽으나 같은 문장
+  - ex) mom, racecar
+- 치환(permutataion)
+  - 문자열안에 문자의 순서를 바꾼것
+  - ex) mmo, omm
+
+abc|cba
+
+- 회문은 위와같이 가운데를 나눴을때 양쪽이 대칭이 되야한다.
+
+abc|d|cba
+
+- 가운데 한 글자는 예외적으로 홀수가 될 수 있다.
+
+| a 0 | b 1 | c 2 | …. | x 23 | y 24 | z 25 |
+| --- | --- | --- | --- | --- | --- | --- |
+1. 문자열을 배열에 문자별로 만들어준다.
+2. 배열을 돌면서 홀수개의 문자가 1개 이상이면 규칙에 어긋나므로 회문이 될 수 없다.
+
+```java
+package arrays_and_strings;
+
+public class PalindromeOfPermutation {
+    public static void main(String[] args) {
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e fff"));
+    }
+    private static boolean isPermutationOfPalindrome(String s) {
+        int[] table = buildCharFrequencyTable(s);
+        return checkMaxOneOdd(table);
+    }
+    private static int[] buildCharFrequencyTable(String s) {
+        int[] table = new int[Character.getNumericValue('z') - Character.getNumericValue('a') + 1];
+        for(char c : s.toCharArray()) {
+            int x = getCharNumber(c);
+            if ( x != -1 ) {
+                table[x]++;
+            }
+        }
+        return table;
+    }
+    private static int getCharNumber(Character c){
+        int a = Character.getNumericValue('a');
+        int z = Character.getNumericValue('z');
+        int val = Character.getNumericValue(c);
+        if ( a <= val && val <= z ) {
+            return val - a;
+        }
+        return -1;
+    }
+    private static boolean checkMaxOneOdd(int[] table) {
+        boolean foundOdd = false;
+        for(int count : table) {
+            if ( count % 2 == 1 ) {
+                if ( !foundOdd ) {
+                    foundOdd = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+```
+
+- 위의 코드는 O(n)의 시간 복잡도가 걸린다.
+- 더 이상의 최적화할 수는 없고 코드를 줄여보자
+
+```java
+package arrays_and_strings;
+
+public class PalindromeOfPermutation {
+    public static void main(String[] args) {
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e fff"));
+    }
+    private static boolean isPermutationOfPalindrome(String s) {
+        int countOdd = 0;
+        int[] table = new int[Character.getNumericValue('z') - Character.getNumericValue('a') + 1];
+        for(char c : s.toCharArray()) {
+            int x = getCharNumber(c);
+            if ( x != -1 ) {
+                table[x]++;
+                if ( table[x] % 2 == 1 ) {
+                    countOdd++;
+                } else {
+                    countOdd--;
+                }
+            }
+        }
+        return countOdd <= 1;
+    }
+
+    private static int getCharNumber(Character c){
+        int a = Character.getNumericValue('a');
+        int z = Character.getNumericValue('z');
+        int val = Character.getNumericValue(c);
+        if ( a <= val && val <= z ) {
+            return val - a;
+        }
+        return -1;
+    }
+}
+```
+
+## 배열방 대신 Bit를 이용해서 해결해보자
+
+| z 0 | y 0 | x 1 | … | c 0 | b 1 | a 1 |
+| --- | --- | --- | --- | --- | --- | --- |
+1. 짝수면 0 홀수면 1을 해당 자릿수에 저장해서 나중에 1이 없거나 딱 1개만 있는지를 bit 연산자를 이용해서 확인하면된다.
+
+“dadccd”
+
+2. d부터 bit에 세팅해줄때 a를 0번방이라고 하면 d는 3번방이므로 1 << 3 연산을 해준다.
+   → “0001000”
+3. 다음은 a이므로 1 << 0 연산을 해준다. 이때 기존의 Bit의 a가 홀수개였으면 0으로 세팅하고 짝수개였으면 1로 세팅해주어야한다.
+   → “0000001”
+
+   0001000
+   & 0000001
+   ——————
+   0000000
+4. 두 Bit를 and 연산했을때 현재로서는 0을 반환하므로 기존 문자의 개수가 짝수개라고 확인이 된다.
+   0001000
+   |   0000001
+   ——————
+   0001001
+5. 기존 문자열이 짝수였던걸 알았으므로 두 BIt를 OR연산을 해준다.
+6. 다음은 d가 나왔는데 위와같이 1 << 3을 해주고 기존의 Bit와 and연산을 해준다.
+   0001001
+   & 0001000
+   ——————
+   0001000
+7. 결과가 0이 아니므로 기존 문자의 개수가 홀수개라고 확인이 되었으므로 not연산을 먼저해준다.
+   ~ 0001000
+   ——————
+   1110111
+8. 그리고나서 기존의 Bit값과 not연산을 한 Bit값을 and연산해준다.
+   0001001
+   & 1110111
+   —————
+   0000001
+9. 위와같은 방법으로 문자열의 끝까지 반복하여 값을 구한다.
+
+```java
+package arrays_and_strings;
+
+public class PalindromeOfPermutation {
+    public static void main(String[] args) {
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e"));
+        System.out.println(isPermutationOfPalindrome("aa bb cc dd e fff"));
+    }
+    private static boolean isPermutationOfPalindrome(String s) {
+        int bitVector = createBitVector(s);
+        return bitVector == 0 || checkExactlyOneBitSet(bitVector);
+    }
+    private static int createBitVector(String s) {
+        int bitVector = 0;
+        for(char c : s.toCharArray()) {
+            int x = getCharNumber(c);
+            bitVector = toggle(bitVector, x);
+        }
+        return bitVector;
+    }
+    private static int toggle(int bitVector, int index) {
+        if ( index < 0 ) return bitVector;
+        int mask = 1 << index;
+        if ( (bitVector & mask) == 0 ) {
+            bitVector |= mask;
+        } else {
+            bitVector &= ~mask;
+        }
+        return bitVector;
+    }
+    private static boolean checkExactlyOneBitSet(int bitVector) {
+        return (bitVector & (bitVector - 1)) == 0;
+    }
+		private static int getCharNumber(Character c){
+        int a = Character.getNumericValue('a');
+        int z = Character.getNumericValue('z');
+        int val = Character.getNumericValue(c);
+        if ( a <= val && val <= z ) {
+            return val - a;
+        }
+        return -1;
+    }
+}
+```
