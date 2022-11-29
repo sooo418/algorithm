@@ -738,3 +738,64 @@ public class PalindromeOfPermutation {
     }
 }
 ```
+
+# 단 한번만 편집된 문자열인지 알아내기
+
+- 세가지 문자열 편집기능이 있다.
+    - 문자를 한개 삽입하는 기능
+    - 문자를 한개 삭제하는 기능
+    - 문자를 한개 수정하는 기능
+- 주어진 두 개의 문자열이 편집기능을 단 한번만 이용한 경우(또는 한번도 이용하지 않은 경우)인지를 알아내는 함수를 구현하시오.
+
+- insert a : ple → pale
+- remove e : pale → pal
+- replace p,b : pale → bale
+
+- 단 한번만 편집기능을 이용한 경우라면 두 개의 문자열의 길이가 한개 이상 차이가 나면 안된다.
+    - 한개 이상 차이가 나면 바로 false를 반환
+    - 길이가 한개만 다를 경우는 insert또는 remove의 기능을 이용한것이다.
+    - insert나 remove의 기능을 이용했을 경우 short와 long의 문자열을 구분해 길이가 하나 다른 문자를 제외하고는 다 같아야한다.
+- 두 문자열의 길이가 같을 경우 replace의 기능을 이용한것이다.
+    - 이때 문자열이 서로 같거나 또는 하나의 문자만 틀려야한다.
+
+```java
+package arrays_and_strings;
+
+import sun.nio.cs.Surrogate;
+
+public class IsOneAway {
+    public static void main(String[] args) {
+        System.out.println(isOneAway("pal", "pale"));
+        System.out.println(isOneAway("pale", "pal"));
+        System.out.println(isOneAway("pale", "bale"));
+
+        System.out.println(isOneAway("pal", "pales"));
+        System.out.println(isOneAway("pale", "pel"));
+        System.out.println(isOneAway("pale", "bake"));
+    }
+    private static boolean isOneAway(String s1, String s2) {
+        String ss, ls;
+        if ( s1.length() < s2.length() ) {
+            ss = s1;
+            ls = s2;
+        } else {
+            ss = s2;
+            ls = s1;
+        }
+        if ( ls.length() - ss.length() > 1 ) return false;
+        boolean flag = false;
+        for(int i = 0, j = 0; i < ss.length(); i++, j++) {
+            if ( ss.charAt(i) != ls.charAt(j) ) {
+                if ( flag ) {
+                    return false;
+                }
+                flag = true;
+                if ( ss.length() != ls.length() ) {
+                    j++;
+                }
+            }
+        }
+        return true;
+    }
+}
+```
