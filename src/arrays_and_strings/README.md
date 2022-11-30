@@ -799,3 +799,53 @@ public class IsOneAway {
     }
 }
 ```
+
+# 문자열 압축(Compression)하기
+
+aabbbccccd
+
+- 위와같은 문자열이 있을때 반복되는 문자를 숫자로 압축해서 표현하는 함수를 구현하시오.
+    - aabbbccccd → a2b3c4d1
+- 만약에 압축한 문자열이 원본보다 클 경우 원본을 반환하여아 한다.
+
+```java
+package arrays_and_strings;
+
+import java.lang.StringBuilder;
+
+public class CompressString {
+    public static void main(String[] args) {
+        System.out.println(compressString("aabbbbbccccdd"));
+        System.out.println("abcd");
+    }
+    private static String compressString(String str) {
+        String newStr = compress(str);
+        return str.length() < newStr.length() ? str : newStr;
+    }
+    private static String compress(String str) {
+        int count = 0;
+        StringBuilder newString = new StringBuilder(getTotal(str));
+        for(int i = 0; i < str.length(); i++) {
+            count++;
+            if ( i + 1 >= str.length() || str.charAt(i) != str.charAt(i + 1) ) {
+                newString.append(str.charAt(i));
+                newString.append(count);
+                count = 0;
+            }
+        }
+        return newString.toString();
+    }
+    private static int getTotal(String str) {
+        int count = 0;
+        int total = 0;
+        for(int i = 0; i < str.length(); i++) {
+            count++;
+            if ( i + 1 >= str.length() || str.charAt(i) != str.charAt(i + 1) ) {
+                total += 1 + String.valueOf(count).length();
+                count = 0;
+            }
+        }
+        return total;
+    }
+}
+```~~~~
