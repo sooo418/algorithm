@@ -848,4 +848,183 @@ public class CompressString {
         return total;
     }
 }
-```~~~~
+```
+
+# 이미지 회전 알고리즘
+
+- 가로 세로가 N x N 픽셀인 이미지가 2차원 배열에 저장되어있을때 90도 회전하는 알고리즘을 별도의 저장공간을 사용하지않고 구현하시오.
+    - 저장공간 : 배열이나 해시테이블 등 자료구조를 의미함.
+
+|  |  |  |  |
+| --- | --- | --- | --- |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+- 문제를 간단하게 만들기위해 이미지의 바깥쪽 레이어를 왼쪽으로 90도 회전하는 방법을 생각해보자
+
+R : 빨강
+
+B : 파랑
+
+G : 초록
+
+Y : 노랑
+
+| R | R | R | B |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+| Y | G | G | G |
+1. 우선 배열방의 데이터를 보관할 하나의 변수를 선언한다.
+2. 배열방의 맨 위에 있는 빨간색 배열의 첫번째 값 R을 임시 변수에 저장한다.
+   dynamic = R
+
+|  | R | R | B |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+| Y | G | G | G |
+3. 빨간색 배열의 첫번째 값에 파란색 배열의 첫번째 값을 넣어준다.
+   dynamic = R
+
+| B | R | R |  |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+| Y | G | G | G |
+4. 파란색 배열의 첫번째 값이 비었으니 초록색 배열의 첫번째 값을 넣어준다.
+   dynamic = R
+
+| B | R | R | G |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+| Y | G | G |  |
+5. 또 초록색 배열의 첫번째 값이 비었으니 노란색 배열의 첫번째 값을 넣어준다.
+   dynamic = R
+
+| B | R | R | G |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+|  | G | G | Y |
+6. 이제 노락색 배열의 첫번째 값이 비었으니 임시 변수에 저장해놓은 빨간색 첫번째 값을 넣어준다.
+
+| B | R | R | G |
+| --- | --- | --- | --- |
+| Y |  |  | B |
+| Y |  |  | B |
+| R | G | G | Y |
+7. 그럼 또 똑같이 1~6 과정을 빨간색 배열의 마지막 값까지 반복해준다.
+
+| B | B | B | G |
+| --- | --- | --- | --- |
+| R |  |  | G |
+| R |  |  | G |
+| R | Y | Y | Y |
+
+Ex)
+
+| 00 | 01 | 02 | 03 | 04 |
+| --- | --- | --- | --- | --- |
+| 10 | 11 | 12 | 13 | 14 |
+| 20 | 21 | 22 | 23 | 24 |
+| 30 | 31 | 32 | 33 | 34 |
+| 40 | 41 | 42 | 43 | 44 |
+
+> tmp = 00\
+00 = 04\
+04 = 44\
+40 = tmp
+>
+> 이런식으로 위에서 했던 방식대로 n - 1번 반복해준다. 바깥쪽 레이어는 회전이 끝난다.
+
+---
+
+> 바깥쪽 레이어의 회전이 끝났으면 그 다음 레이어를 왼쪽으로 회전해준다.
+> 
+> tmp = 11\
+11 = 13\
+13 = 33\
+33 = 31\
+31 = tmp
+
+- 레이어를 돌릴때마다 규칙이 보이는데 다음 레이어로 이동할때 시작점은 1 증가하고 끝나는 지점은 1 감소하는 패턴이 보인다.
+
+> s(시작점) = 1, e(끝나는 지점) = 3\
+Loop : i = 1, 2, 3\
+j = 3, 2, 1\
+> Top : [s][i]\
+Right : [i][e]\
+Bottom : [e][j]\
+Left : [j][s]
+> 
+> tmp = Top\
+Top = Right\
+Right = Bottom\
+Bottom = Left\
+Left = tmp
+
+---
+
+> 총 정리를 해보면
+> 
+> Loop : s = 0, e = 4\
+s++, e--\
+Loop : i = s → e\
+j = e → s
+>
+>tmp = [s][i]\
+[s][i] = [i][e]\
+[i][e] = [e][j]\
+[e][j] = [j][s]\
+[j][s] = tmp
+>
+>라는 공식이 완성된다.
+
+```java
+package arrays_and_strings;
+
+public class RotateImage {
+    public static void main(String[] args) {
+        int[][] image = {
+                {1, 0, 0, 0, 1},
+                {0, 1, 0, 1, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0}
+        };
+        printImage(image);
+        rotateImage(image);
+        printImage(image);
+        rotateImage(image);
+        printImage(image);
+        rotateImage(image);
+        printImage(image);
+        rotateImage(image);
+        printImage(image);
+    }
+    private static int[][] rotateImage(int[][] image) {
+        int tmp;
+        for(int s = 0, e = image.length - 1; s < e; s++, e--) {
+            for(int i = s, j = e; i < e; i++, j--) {
+                tmp = image[s][i];
+                image[s][i] = image[i][e];
+                image[i][e] = image[e][j];
+                image[e][j] = image[j][s];
+                image[j][s] = tmp;
+            }
+        }
+        return image;
+    }
+    private static void printImage(int[][] image) {
+        for(int i = 0; i < image.length; i++) {
+            for(int j = 0; j < image[i].length; j++) {
+                System.out.print(image[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+}
+```
