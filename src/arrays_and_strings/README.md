@@ -1028,3 +1028,93 @@ public class RotateImage {
     }
 }
 ```
+
+# 이차원 배열에서 0의 행과 열을 모두 0으로 바꾸기
+
+| 1 | 1 | 1 | 1 |
+| --- | --- | --- | --- |
+| 1 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 |
+
+↓
+
+| 1 | 1 | 0 | 1 |
+| --- | --- | --- | --- |
+| 1 | 1 | 0 | 1 |
+| 0 | 0 | 0 | 0 |
+| 1 | 1 | 0 | 1 |
+- 이차원 배열안에서 0을 발견하면 해당 행과 열을 모두 0으로 바꿔주시오.
+
+1. 이차원 배열에서 0을 찾는다.
+2. 0을 발견하는 즉시 해당 행과 열을 0으로 바꾸면 기존에 행 또는 열에서 0이던 값이 사라져버리므로 따로 행과 열의 인덱스를 저장해놓는다.
+3. 계속해서 이차원을 돌면서 0을 발견하면 처음에 발견되었던 행과 현재 발견된 0의 열의 값을 0으로, 현재 발견된 0의 행과 처음에 발견되었던 열의 값을 0으로 세팅해준다.
+4. 위의 방식을 이차원 배열이 끝날때까지 반복해서 0을 세팅해준다.
+5. 이차원 배열의 열을 처음부터 끝까지 반복문을 돌려 0이 발견되면 처음에 발견되었던 열의 위치를 제외하고는 해당 열의 모든 값들을 0으로 치환해준다.
+6. 이차원배열의 행을 처음부터 끝까지 반복문을 돌려 0이 발견되면 행의 모든 값들을 0으로 치환해준다.
+7. 처음에 발견되었던 열의 모든 값들을 0으로 치환해준다.
+
+```java
+package arrays_and_strings;
+
+public class SetZeroRowColumn {
+    public static void main(String[] args) {
+        int[][] matrix = {
+                {1, 1, 1, 1},
+                {1, 0, 1, 1},
+                {1, 1, 1, 0},
+                {1, 0, 1, 1}
+        };
+        printImage(matrix);
+        setZeroToAllZero(matrix);
+        printImage(matrix);
+    }
+    private static void setZeroToAllZero(int[][] matrix) {
+        int fc = -1;
+        int fr = -1;
+        for(int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[row].length; col++) {
+                if (matrix[row][col] == 0) {
+                    if (fc == -1) {
+                        fc = col;
+                        fr = row;
+                    }
+                    matrix[fr][col] = 0;
+                    matrix[row][fc] = 0;
+                }
+            }
+        }
+        if ( fc == -1 ) return;
+        for(int col = 0; col < matrix[0].length; col++) {
+            if ( matrix[fr][col] == 0 && col != fc ) {
+                setColsToZero(col, matrix);
+            }
+        }
+        for(int row = 0; row < matrix.length; row++) {
+            if ( matrix[row][fc] == 0 ) {
+                setRowsToZero(row, matrix);
+            }
+        }
+        setColsToZero(fc, matrix);
+    }
+    private static void setColsToZero(int col, int[][] matrix) {
+        for(int row = 0; row < matrix.length; row++) {
+            matrix[row][col] = 0;
+        }
+    }
+    private static void setRowsToZero(int row, int[][] matrix) {
+        for(int col = 0; col < matrix[row].length; col++) {
+            matrix[row][col] = 0;
+        }
+    }
+    private static void printImage(int[][] image) {
+        for(int i = 0; i < image.length; i++) {
+            for(int j = 0; j < image[i].length; j++) {
+                System.out.print(image[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+}
+```
