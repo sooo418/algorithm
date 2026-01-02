@@ -1,7 +1,5 @@
 package arrays_and_strings;
 
-import sun.nio.cs.Surrogate;
-
 public class IsOneAway {
     public static void main(String[] args) {
         System.out.println(isOneAway("pal", "pale"));
